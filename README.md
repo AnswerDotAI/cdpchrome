@@ -10,6 +10,15 @@ Download the latest release for your platform from [Releases](../../releases).
 
 **macOS**: Unzip and drag `CDP Chrome.app` into Applications. Or run `cdpchrome` from the terminal.
 
+On first launch, macOS will block the app because it's not signed. To allow it:
+
+1. Open **System Settings > Privacy & Security**
+2. Scroll down to the Security section — you'll see a message about "CDP Chrome" being blocked
+3. Click **Open Anyway**
+4. Enter your password and click OK
+
+You only need to do this once.
+
 **Linux**: Extract the tarball and run the install script:
 ```bash
 tar xzf cdpchrome-linux-amd64.tar.gz

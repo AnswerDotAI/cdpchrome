@@ -1,18 +1,29 @@
 #!/bin/bash
 set -euo pipefail
 
-# Build a macOS .app bundle from a pre-built binary
-# Usage: build-macos-app.sh <binary-path> <icon.icns> <output.app>
+# Build a macOS .app bundle with a shell script launcher
+# Usage: build-macos-app.sh <icon.icns> <output.app>
 
-BINARY="${1:?usage: build-macos-app.sh <binary> <icon.icns> <output.app>}"
-ICON="${2:?}"
-APP="${3:?}"
+ICON="${1:?usage: build-macos-app.sh <icon.icns> <output.app>}"
+APP="${2:?}"
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BINARY" "$APP/Contents/MacOS/cdpchrome"
-chmod +x "$APP/Contents/MacOS/cdpchrome"
 cp "$ICON" "$APP/Contents/Resources/app.icns"
+
+cat > "$APP/Contents/MacOS/cdpchrome" <<'LAUNCHER'
+#!/bin/bash
+for chrome in \
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+    "$HOME/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"; do
+    [ -x "$chrome" ] && exec "$chrome" \
+        --remote-debugging-port=9222 \
+        --user-data-dir="$HOME/Library/Application Support/ChromeDebug" \
+        "$@"
+done
+osascript -e 'display alert "CDP Chrome" message "Google Chrome not found in Applications."'
+LAUNCHER
+chmod +x "$APP/Contents/MacOS/cdpchrome"
 
 cat > "$APP/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>

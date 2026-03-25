@@ -8,11 +8,7 @@ LDFLAGS="-s -w -X main.version=$VERSION"
 mkdir -p build
 
 build_macos() {
-    CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="$LDFLAGS" -o build/cdpchrome-amd64 .
-    CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="$LDFLAGS" -o build/cdpchrome-arm64 .
-    lipo -create -output build/cdpchrome build/cdpchrome-amd64 build/cdpchrome-arm64
-    rm build/cdpchrome-amd64 build/cdpchrome-arm64
-    bash scripts/build-macos-app.sh build/cdpchrome icons/icon.icns "build/CDP Chrome.app"
+    bash scripts/build-macos-app.sh icons/icon.icns "build/CDP Chrome.app"
     cd build && zip -r cdpchrome-macos.zip "CDP Chrome.app"
     echo "Built build/cdpchrome-macos.zip"
 }
@@ -39,7 +35,7 @@ build_windows() {
 case "$TARGET" in
     native) go build -ldflags="$LDFLAGS" -o build/cdpchrome .
             if [ "$(uname)" = "Darwin" ]; then
-                bash scripts/build-macos-app.sh build/cdpchrome icons/icon.icns "build/CDP Chrome.app"
+                bash scripts/build-macos-app.sh icons/icon.icns "build/CDP Chrome.app"
             fi
             echo "Built build/cdpchrome" ;;
     macos)   build_macos ;;
