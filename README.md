@@ -15,16 +15,18 @@ This downloads the latest release and installs `CDP Chrome.app` to Applications.
 
 Alternatively, download from [Releases](../../releases), unzip, and drag to Applications. If you install this way, macOS will block the app on first launch because it's not signed — go to **System Settings > Privacy & Security** and click **Open Anyway**.
 
-**Linux**: Extract the tarball and run the install script:
+**Linux**: Download the latest release from [Releases](../../releases). Extract the tarball and run the install script:
 ```bash
 tar xzf cdpchrome-linux-amd64.tar.gz
 ./install.sh            # installs to ~/.local by default
 ./install.sh /usr/local # or system-wide
 ```
 
-**Windows**: Unzip and run `cdpchrome.exe`.
+**Windows**: Download the latest release for your platform from [Releases](../../releases). Unzip and run `cdpchrome.exe`.
 
 ## Usage
+
+On Mac, run 'CDP Chrome' from Spotlight or any normal Mac launching approach. Or on any platform through the terminal:
 
 ```bash
 cdpchrome                    # launch Chrome with CDP on port 9222
