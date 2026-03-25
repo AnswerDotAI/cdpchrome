@@ -6,18 +6,14 @@ Chrome is launched with `--remote-debugging-port=9222` and a dedicated user data
 
 ## Install
 
-Download the latest release for your platform from [Releases](../../releases).
+**macOS**:
+```bash
+curl -fsSL https://raw.githubusercontent.com/AnswerDotAI/cdpchrome/main/install-mac.sh | bash
+```
 
-**macOS**: Unzip and drag `CDP Chrome.app` into Applications. Or run `cdpchrome` from the terminal.
+This downloads the latest release and installs `CDP Chrome.app` to Applications.
 
-On first launch, macOS will block the app because it's not signed. To allow it:
-
-1. Open **System Settings > Privacy & Security**
-2. Scroll down to the Security section — you'll see a message about "CDP Chrome" being blocked
-3. Click **Open Anyway**
-4. Enter your password and click OK
-
-You only need to do this once.
+Alternatively, download from [Releases](../../releases), unzip, and drag to Applications. If you install this way, macOS will block the app on first launch because it's not signed — go to **System Settings > Privacy & Security** and click **Open Anyway**.
 
 **Linux**: Extract the tarball and run the install script:
 ```bash
