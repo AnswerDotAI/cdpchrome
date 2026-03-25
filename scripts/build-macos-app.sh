@@ -16,7 +16,7 @@ cat > "$APP/Contents/MacOS/cdpchrome" <<'LAUNCHER'
 for chrome in \
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
     "$HOME/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"; do
-    [ -x "$chrome" ] && exec "$chrome" \
+    [ -x "$chrome" ] && exec arch -arm64 "$chrome" \
         --remote-debugging-port=9222 \
         --user-data-dir="$HOME/Library/Application Support/ChromeDebug" \
         "$@"
