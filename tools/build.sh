@@ -7,28 +7,21 @@ VERSION=$(cat VERSION | tr -d '[:space:]')
 LDFLAGS="-s -w -X main.version=$VERSION"
 mkdir -p build
 
-build_icons() {
-    [ -f build/icons/icon-256.png ] && return
-    bash scripts/make-icon.sh icon.svg build/icons
-}
-
 build_macos() {
-    build_icons
     CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="$LDFLAGS" -o build/cdpchrome-amd64 .
     CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="$LDFLAGS" -o build/cdpchrome-arm64 .
     lipo -create -output build/cdpchrome build/cdpchrome-amd64 build/cdpchrome-arm64
     rm build/cdpchrome-amd64 build/cdpchrome-arm64
-    bash scripts/build-macos-app.sh build/cdpchrome build/icons/icon.icns "build/CDP Chrome.app"
+    bash scripts/build-macos-app.sh build/cdpchrome icons/icon.icns "build/CDP Chrome.app"
     cd build && zip -r cdpchrome-macos.zip "CDP Chrome.app"
     echo "Built build/cdpchrome-macos.zip"
 }
 
 build_linux() {
-    build_icons
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="$LDFLAGS" -o build/cdpchrome .
     mkdir -p build/pkg
     cp build/cdpchrome build/pkg/
-    cp build/icons/icon-256.png build/pkg/cdpchrome.png
+    cp icons/icon-256.png build/pkg/cdpchrome.png
     cp cdpchrome.desktop build/pkg/
     cp scripts/install-linux.sh build/pkg/install.sh
     chmod +x build/pkg/install.sh build/pkg/cdpchrome
@@ -46,8 +39,7 @@ build_windows() {
 case "$TARGET" in
     native) go build -ldflags="$LDFLAGS" -o build/cdpchrome .
             if [ "$(uname)" = "Darwin" ]; then
-                build_icons
-                bash scripts/build-macos-app.sh build/cdpchrome build/icons/icon.icns "build/CDP Chrome.app"
+                bash scripts/build-macos-app.sh build/cdpchrome icons/icon.icns "build/CDP Chrome.app"
             fi
             echo "Built build/cdpchrome" ;;
     macos)   build_macos ;;

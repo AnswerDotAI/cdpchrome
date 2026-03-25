@@ -15,8 +15,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with: { go-version: '1.24' }
-      - name: Install ImageMagick
-        run: brew install imagemagick
       - run: tools/build.sh macos
       - uses: actions/upload-artifact@v4
         with:
@@ -29,8 +27,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with: { go-version: '1.24' }
-      - name: Install ImageMagick
-        run: sudo apt-get install -y imagemagick
       - run: tools/build.sh linux
       - uses: actions/upload-artifact@v4
         with:
