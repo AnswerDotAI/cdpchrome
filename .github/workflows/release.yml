@@ -1,0 +1,65 @@
+name: Build and Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.24' }
+      - name: Install ImageMagick
+        run: brew install imagemagick
+      - run: tools/build.sh macos
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: build/cdpchrome-macos.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.24' }
+      - name: Install ImageMagick
+        run: sudo apt-get install -y imagemagick
+      - run: tools/build.sh linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: build/cdpchrome-linux-amd64.tar.gz
+
+  build-windows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.24' }
+      - run: tools/build.sh windows
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: build/cdpchrome-windows-amd64.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build-macos, build-linux, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: artifacts }
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/macos/cdpchrome-macos.zip
+            artifacts/linux/cdpchrome-linux-amd64.tar.gz
+            artifacts/windows/cdpchrome-windows-amd64.zip
+          generate_release_notes: true
