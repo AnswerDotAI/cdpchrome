@@ -1,6 +1,6 @@
 # cdpchrome
 
-Launch Google Chrome with [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) (CDP) remote debugging enabled. A standalone binary that works from the command line, Finder, Explorer, or Linux desktop launchers.
+Launch Google Chrome with [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) (CDP) remote debugging enabled.
 
 Chrome is launched with `--remote-debugging-port=9222` and a dedicated user data directory so it doesn't interfere with your normal Chrome profile.
 
@@ -15,18 +15,28 @@ This downloads the latest release and installs `CDP Chrome.app` to Applications.
 
 Alternatively, download from [Releases](../../releases), unzip, and drag to Applications. If you install this way, macOS will block the app on first launch because it's not signed — go to **System Settings > Privacy & Security** and click **Open Anyway**.
 
-**Linux**: Download the latest release from [Releases](../../releases). Extract the tarball and run the install script:
+**Linux**:
+```bash
+curl -fsSL https://raw.githubusercontent.com/AnswerDotAI/cdpchrome/main/cdpchrome.sh -o ~/.local/bin/cdpchrome && chmod +x ~/.local/bin/cdpchrome
+```
+
+Or download from [Releases](../../releases) and run the install script for desktop integration (icon + app launcher):
 ```bash
 tar xzf cdpchrome-linux-amd64.tar.gz
 ./install.sh            # installs to ~/.local by default
 ./install.sh /usr/local # or system-wide
 ```
 
-**Windows**: Download the latest release for your platform from [Releases](../../releases). Unzip and run `cdpchrome.exe`.
+**Windows** (PowerShell as admin):
+```powershell
+irm https://raw.githubusercontent.com/AnswerDotAI/cdpchrome/main/install-windows.ps1 | iex
+```
+
+This finds Chrome, downloads the icon, and creates a Start Menu shortcut.
 
 ## Usage
 
-On Mac, run 'CDP Chrome' from Spotlight or any normal Mac launching approach. Or on any platform through the terminal:
+On Mac, run 'CDP Chrome' from Spotlight or any normal Mac launching approach. On Windows, use the Start Menu shortcut. On any platform through the terminal:
 
 ```bash
 cdpchrome                    # launch Chrome with CDP on port 9222

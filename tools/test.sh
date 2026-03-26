@@ -2,10 +2,13 @@
 set -e
 cd "$(dirname "$0")/.."
 
-go build -o build/cdpchrome .
+tools/build.sh native
 echo "Build: OK"
 
-# Quick smoke test — binary runs and prints usage/error without Chrome
-if build/cdpchrome --help 2>&1 | head -1 | grep -q .; then
-    echo "Run:   OK"
+# Check Linux script syntax
+bash -n cdpchrome.sh && echo "Syntax check (cdpchrome.sh): OK"
+
+# Check PowerShell syntax if available
+if command -v pwsh >/dev/null 2>&1; then
+    pwsh -NoProfile -Command "Get-Command -Syntax install-windows.ps1" >/dev/null 2>&1 && echo "Syntax check (install-windows.ps1): OK"
 fi

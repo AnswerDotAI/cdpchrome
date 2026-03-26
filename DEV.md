@@ -3,7 +3,9 @@
 ## Project structure
 
 ```
-main.go                          # the entire app — single file
+cdpchrome.sh                     # Linux launcher script
+install-mac.sh                   # macOS installer (curl | bash)
+install-windows.ps1              # Windows installer (creates Start Menu shortcut)
 icon.svg                         # source icon
 icons/                           # pre-built icons (committed; regenerate with tools/icons.sh)
 cdpchrome.desktop                # Linux desktop entry
@@ -15,36 +17,18 @@ tools/
   bump.sh / bump2.sh             # patch / minor version bump
   release.sh                     # tag + push (triggers CI release)
 scripts/
-  build-macos-app.sh             # binary + icon → .app bundle
-  install-linux.sh               # installs binary + desktop entry on Linux
+  build-macos-app.sh             # icon → .app bundle (shell script launcher)
+  install-linux.sh               # installs script + desktop entry on Linux
 .github/workflows/release.yml    # CI — calls tools/build.sh per platform
 ```
 
 ## How it works
 
-`main.go` is a small file with three responsibilities:
+Each platform has a simple script that finds Chrome and launches it with `--remote-debugging-port=9222` and a dedicated `--user-data-dir`.
 
-1. **Find Chrome** — `chromeExecutable()` / `chromeAppBundle()` check platform-specific paths. On Linux it also tries `$PATH` via `LookPath`.
-
-2. **Build args** — always passes `--remote-debugging-port=9222` and `--user-data-dir=<platform-specific path>`, plus any extra CLI args (`os.Args[1:]`).
-
-3. **Launch** — the strategy differs per OS:
-   - **macOS**: Uses `open -n -a <Chrome.app> --args ...`. The `-n` forces a new instance (otherwise `open` just activates existing Chrome and ignores `--args`). Using `open` instead of directly exec'ing Chrome's binary avoids macOS App Management TCC blocks ("prevented from modifying apps").
-   - **Linux**: `syscall.Exec` replaces the process with Chrome (like `exec` in a shell script).
-   - **Windows**: `exec.Command` + `Start()` spawns Chrome and exits immediately.
-
-### macOS .app bundle
-
-`scripts/build-macos-app.sh` creates the standard bundle structure:
-```
-CDP Chrome.app/
-  Contents/
-    Info.plist
-    MacOS/cdpchrome      # the Go binary
-    Resources/app.icns   # the icon
-```
-
-This makes it draggable to `/Applications` and launchable from Finder/Spotlight.
+- **macOS**: `scripts/build-macos-app.sh` creates a `.app` bundle containing a bash launcher. The launcher finds Chrome in `/Applications` and uses `arch -arm64` to run it.
+- **Linux**: `cdpchrome.sh` searches `$PATH` then well-known locations for Chrome/Chromium, then `exec`s it.
+- **Windows**: `install-windows.ps1` finds `chrome.exe` in Program Files/LocalAppData, then creates a Start Menu shortcut pointing to Chrome with the CDP args baked in.
 
 ### User data directories
 
@@ -58,17 +42,17 @@ A separate Chrome profile is used so CDP Chrome doesn't touch the user's normal 
 
 ## Building
 
-Requires Go 1.21+.
+No compiler needed — just shell scripts.
 
 ```bash
-tools/build.sh              # native binary (+ .app on macOS)
-tools/build.sh macos        # universal binary + .app + zip
-tools/build.sh linux        # amd64 binary + tarball with .desktop + install script
-tools/build.sh windows      # amd64 exe + zip
+tools/build.sh              # native build (+ .app on macOS)
+tools/build.sh macos        # .app + zip
+tools/build.sh linux        # script + tarball with .desktop + install script
+tools/build.sh windows      # installer ps1 + icon zip
 tools/build.sh all          # all of the above
 ```
 
-Output goes to `build/`. CI runs `tools/build.sh <target>` for each platform, so what CI does is exactly what you can do locally.
+Output goes to `build/`. CI runs `tools/build.sh all` on ubuntu-latest.
 
 ### Updating icons
 
@@ -81,10 +65,10 @@ tools/icons.sh
 ## Testing
 
 ```bash
-tools/test.sh               # builds + smoke test
+tools/test.sh               # builds + syntax checks
 ```
 
-Manual test: run `build/cdpchrome`, then `curl http://localhost:9222/json/version` should return Chrome's version info.
+Manual test: run `build/cdpchrome` (or open `build/CDP Chrome.app` on macOS), then `curl http://localhost:9222/json/version` should return Chrome's version info.
 
 ## Releasing
 

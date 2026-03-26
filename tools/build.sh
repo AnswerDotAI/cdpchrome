@@ -2,9 +2,7 @@
 set -e
 cd "$(dirname "$0")/.."
 
-TARGET="${1:-native}"  # native, macos, linux, windows
-VERSION=$(cat VERSION | tr -d '[:space:]')
-LDFLAGS="-s -w -X main.version=$VERSION"
+TARGET="${1:-native}"
 mkdir -p build
 
 build_macos() {
@@ -14,9 +12,8 @@ build_macos() {
 }
 
 build_linux() {
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="$LDFLAGS" -o build/cdpchrome .
     mkdir -p build/pkg
-    cp build/cdpchrome build/pkg/
+    cp cdpchrome.sh build/pkg/cdpchrome
     cp icons/icon-256.png build/pkg/cdpchrome.png
     cp cdpchrome.desktop build/pkg/
     cp scripts/install-linux.sh build/pkg/install.sh
@@ -27,17 +24,17 @@ build_linux() {
 }
 
 build_windows() {
-    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="$LDFLAGS" -o build/cdpchrome.exe .
-    cd build && zip cdpchrome-windows-amd64.zip cdpchrome.exe
-    echo "Built build/cdpchrome-windows-amd64.zip"
+    cd build && zip cdpchrome-windows.zip -j ../install-windows.ps1 ../icons/icon.ico
+    echo "Built build/cdpchrome-windows.zip"
 }
 
 case "$TARGET" in
-    native) go build -ldflags="$LDFLAGS" -o build/cdpchrome .
-            if [ "$(uname)" = "Darwin" ]; then
+    native) if [ "$(uname)" = "Darwin" ]; then
                 bash scripts/build-macos-app.sh icons/icon.icns "build/CDP Chrome.app"
+            else
+                cp cdpchrome.sh build/cdpchrome && chmod +x build/cdpchrome
             fi
-            echo "Built build/cdpchrome" ;;
+            echo "Built to build/" ;;
     macos)   build_macos ;;
     linux)   build_linux ;;
     windows) build_windows ;;
