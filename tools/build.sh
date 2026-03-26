@@ -7,7 +7,7 @@ mkdir -p build
 
 build_macos() {
     bash scripts/build-macos-app.sh icons/icon.icns "build/CDP Chrome.app"
-    cd build && zip -r cdpchrome-macos.zip "CDP Chrome.app"
+    (cd build && zip -r cdpchrome-macos.zip "CDP Chrome.app")
     echo "Built build/cdpchrome-macos.zip"
 }
 
@@ -18,13 +18,13 @@ build_linux() {
     cp cdpchrome.desktop build/pkg/
     cp scripts/install-linux.sh build/pkg/install.sh
     chmod +x build/pkg/install.sh build/pkg/cdpchrome
-    cd build && tar czf cdpchrome-linux-amd64.tar.gz -C pkg .
+    (cd build && tar czf cdpchrome-linux-amd64.tar.gz -C pkg .)
     rm -rf build/pkg
     echo "Built build/cdpchrome-linux-amd64.tar.gz"
 }
 
 build_windows() {
-    cd build && zip cdpchrome-windows.zip -j ../install-windows.ps1 ../icons/icon.ico
+    (cd build && zip cdpchrome-windows.zip -j ../install-windows.ps1 ../icons/icon.ico)
     echo "Built build/cdpchrome-windows.zip"
 }
 
